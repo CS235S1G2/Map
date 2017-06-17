@@ -116,6 +116,7 @@
   <ItemGroup>
     <ClInclude Include="..\bnode.h" />
     <ClInclude Include="..\wordCount.h" />
+    <ClInclude Include="map.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\bom.txt" />
