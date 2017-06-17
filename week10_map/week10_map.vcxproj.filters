@@ -24,7 +24,7 @@
     <ClInclude Include="..\wordCount.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="map.h">
+    <ClInclude Include="..\map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
