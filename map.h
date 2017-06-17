@@ -12,14 +12,18 @@
 * MAP
 * 
 **********************************************/
+template <class K>
+template <class V>
 template <class T>
 class Map
 {
 public:
 	// constructors
-	Map() : BST(), {}
-	// destructor
+	Map() : BST() {}
+	// copy constructor
 
+	// destructor
+	~Map() {}
 	// methods
 	// empty()
 	// size()
@@ -27,12 +31,11 @@ public:
 	// find()
 	// begin
 	// end()
-
 	// operator=
 	// operator[]
-
 	// members
 	// BST made from pair type
+    BST <Pair<K,V>> bst;
 
 };
 
