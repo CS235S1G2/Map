@@ -7,6 +7,7 @@
 
 #include <iostream> 
 #include "pair.h"
+#include "bst.h"
 /***********************************************
 * MAP
 * 
@@ -16,7 +17,7 @@ class Map
 {
 public:
 	// constructors
-
+	Map() : BST(), {}
 	// destructor
 
 	// methods
