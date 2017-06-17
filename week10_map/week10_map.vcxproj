@@ -117,6 +117,7 @@
     <ClInclude Include="..\bnode.h" />
     <ClInclude Include="..\bst.h" />
     <ClInclude Include="..\map.h" />
+    <ClInclude Include="..\stack.h" />
     <ClInclude Include="..\wordCount.h" />
   </ItemGroup>
   <ItemGroup>
