@@ -9,6 +9,8 @@
 #ifndef BINARY_NODE
 #define BINARY_NODE
 
+enum ColorType { RED, BLACK };
+
 #include <iostream> 
 /***********************************************
 * BINARY NODE
@@ -22,9 +24,12 @@ public:
 	BinaryNode() : pParent(NULL), pLeft(NULL), pRight(NULL)
 	{
 		data = T();
+		setRed();
 	}
 	BinaryNode(const T & t) :
-		data(t), pParent(NULL), pLeft(NULL), pRight(NULL) {}
+		data(t), pParent(NULL), pLeft(NULL), pRight(NULL) {
+		setRed();
+	}
 
 	// methods
 	void addLeft(BinaryNode <T> * pAdd);
@@ -32,9 +37,19 @@ public:
 	void addLeft(const T & t) throw (const char *);
 	void addRight(const T & t) throw (const char *);
 
+	bool isRed() { if (parentColor == RED) return true; else return false; };
+	bool isBlack() { if (parentColor == BLACK) return true; else return false; };
+	void setRed() { parentColor = RED; };
+	void setBlack() { parentColor = BLACK; };
+
+	//void BinaryNode <T> ::verifyRedBlack(int depth) const;
+	//void BinaryNode <T> ::verifyBTree() const;
+	//int BinaryNode <T> ::findDepth() const;
+
 	int size();
 
 	// members
+	ColorType parentColor;
 	T data;
 	BinaryNode <T> * pParent;
 	BinaryNode <T> * pLeft;
@@ -156,87 +171,87 @@ std::ostream & operator << (std::ostream & out, const BinaryNode <T> * rhs)
 }
 
 
-/****************************************************
- * BINARY NODE :: FIND DEPTH
- * Find the depth of the black nodes. This is useful for
- * verifying that a given red-black tree is valid
- * Author: Br. Helfrich
- ****************************************************/
-template <class T>
-int BinaryNode <T> :: findDepth() const
-{
-   // if there are no children, the depth is ourselves
-   if (pRight == NULL && pLeft == NULL)
-      return (isRed ? 0 : 1);
-
-   // if there is a right child, go that way
-   if (pRight != NULL)
-      return (isRed ? 0 : 1) + pRight->findDepth();
-   else
-      return (isRed ? 0 : 1) + pLeft->findDepth();
-}
-
-/****************************************************
- * BINARY NODE :: VERIFY RED BLACK
- * Do all four red-black rules work here?
- * Author: Br. Helfrich
- ***************************************************/
-template <class T>
-void BinaryNode <T> :: verifyRedBlack(int depth) const
-{
-   depth -= (isRed == false) ? 1 : 0;
-
-   // Rule a) Every node is either red or black
-   assert(isRed == true || isRed == false); // this feels silly
-
-   // Rule b) The root is black
-   if (pParent == NULL)
-      assert(isRed == false);
-
-   // Rule c) Red nodes have black children
-   if (isRed == true)
-   {
-      if (pLeft != NULL)
-         assert(pLeft->isRed == false);
-      if (pRight != NULL)
-         assert(pRight->isRed == false);
-   }
-
-   // Rule d) Every path from a leaf to the root has the same # of black nodes
-   if (pLeft == NULL && pRight && NULL)
-      assert(depth == 0);
-   if (pLeft != NULL)
-      pLeft->verifyRedBlack(depth);
-   if (pRight != NULL)
-      pRight->verifyRedBlack(depth);
-}
-
-/******************************************************
- * VERIFY B TREE
- * Verify that the tree is correctly formed
- * Author: Br. Helfrich
- ******************************************************/
-template <class T>
-void BinaryNode <T> :: verifyBTree() const
-{
-   // check parent
-   if (pParent)
-      assert(pParent->pLeft == this || pParent->pRight == this);
-
-   // check left
-   if (pLeft)
-   {
-      assert(pLeft->data <= data);
-      assert(pLeft->pParent == this);
-      pLeft->verifyBTree();
-   }
-
-   // check right
-   if (pRight)
-   {
-      assert(pRight->data >= data);
-      assert(pRight->pParent == this);
-      pRight->verifyBTree();
-   }
-}
+///****************************************************
+// * BINARY NODE :: FIND DEPTH
+// * Find the depth of the black nodes. This is useful for
+// * verifying that a given red-black tree is valid
+// * Author: Br. Helfrich
+// ****************************************************/
+//template <class T>
+//int BinaryNode <T> :: findDepth() const
+//{
+//   // if there are no children, the depth is ourselves
+//   if (pRight == NULL && pLeft == NULL)
+//      return (isRed ? 0 : 1);
+//
+//   // if there is a right child, go that way
+//   if (pRight != NULL)
+//      return (isRed ? 0 : 1) + pRight->findDepth();
+//   else
+//      return (isRed ? 0 : 1) + pLeft->findDepth();
+//}
+//
+///****************************************************
+// * BINARY NODE :: VERIFY RED BLACK
+// * Do all four red-black rules work here?
+// * Author: Br. Helfrich
+// ***************************************************/
+//template <class T>
+//void BinaryNode <T> :: verifyRedBlack(int depth) const
+//{
+//   depth -= (isRed == false) ? 1 : 0;
+//
+//   // Rule a) Every node is either red or black
+//   assert(isRed == true || isRed == false); // this feels silly
+//
+//   // Rule b) The root is black
+//   if (pParent == NULL)
+//      assert(isRed == false);
+//
+//   // Rule c) Red nodes have black children
+//   if (isRed == true)
+//   {
+//      if (pLeft != NULL)
+//         assert(pLeft->isRed == false);
+//      if (pRight != NULL)
+//         assert(pRight->isRed == false);
+//   }
+//
+//   // Rule d) Every path from a leaf to the root has the same # of black nodes
+//   if (pLeft == NULL && pRight && NULL)
+//      assert(depth == 0);
+//   if (pLeft != NULL)
+//      pLeft->verifyRedBlack(depth);
+//   if (pRight != NULL)
+//      pRight->verifyRedBlack(depth);
+//}
+//
+///******************************************************
+// * VERIFY B TREE
+// * Verify that the tree is correctly formed
+// * Author: Br. Helfrich
+// ******************************************************/
+//template <class T>
+//void BinaryNode <T> :: verifyBTree() const
+//{
+//   // check parent
+//   if (pParent)
+//      assert(pParent->pLeft == this || pParent->pRight == this);
+//
+//   // check left
+//   if (pLeft)
+//   {
+//      assert(pLeft->data <= data);
+//      assert(pLeft->pParent == this);
+//      pLeft->verifyBTree();
+//   }
+//
+//   // check right
+//   if (pRight)
+//   {
+//      assert(pRight->data >= data);
+//      assert(pRight->pParent == this);
+//      pRight->verifyBTree();
+//   }
+//}
 #endif // BINARY_NODE

@@ -1,6 +1,6 @@
 /***********************************************************************
  * Component:
- *    Week 09, Binary Search Tree (BST)
+ *    Week 09, Binary Search Tree (RedBlackTreeNode)
  *    Brother Jones, CS 235
  * Author:
  *    Nathan Bench, Jed Billman, Jeremy Chandler, Justin Chandler
@@ -8,32 +8,32 @@
  *    Binary Search Tree
  ************************************************************************/
 
-#ifndef BST_H
-#define BST_H
+#ifndef RedBlackTreeNode_H
+#define RedBlackTreeNode_H
 
 #include "bnode.h"   // for BinaryNode
 #include "stack.h"   // for Stack
 
-// forward declaration for BST iterators
+// forward declaration for RedBlackTreeNode iterators
 template <class T>
-class BSTIterator;
+class RedBlackTreeNodeIterator;
 
 /***********************************************
  * BINARY SEARCH TREE
  * A binary tree that follows the rule pLeft < root < pRight
  **********************************************/
 template <class T>
-class BST
+class RedBlackTreeNode
 {
    public:
       // constructors & destructor
-      BST(): root(NULL) {}
-      BST(const BST <T> & rhs) throw (const char *);
-      ~BST()
+      RedBlackTreeNode(): root(NULL) {}
+      RedBlackTreeNode(const RedBlackTreeNode <T> & rhs) throw (const char *);
+      ~RedBlackTreeNode()
       {
          clear();
       }
-      BST <T> & operator = (const BST <T> & rhs) throw (const char *);
+      RedBlackTreeNode <T> & operator = (const RedBlackTreeNode <T> & rhs) throw (const char *);
       
       // make a friend -- cannot use the same template class as the class definition
       template <class Y>
@@ -53,14 +53,14 @@ class BST
       
       // Binary Search Tree interfaces
       void insert(const T & t) throw (const char *);
-      void remove(BSTIterator <T> & it);
-      BSTIterator <T> find(const T & t);
+      void remove(RedBlackTreeNodeIterator <T> & it);
+      RedBlackTreeNodeIterator <T> find(const T & t);
       
       // iterators
-      BSTIterator <T> begin();
-      BSTIterator <T> end()  { return BSTIterator <T> (NULL); }
-      BSTIterator <T> rbegin();
-      BSTIterator <T> rend() { return BSTIterator <T> (NULL); }
+      RedBlackTreeNodeIterator <T> begin();
+      RedBlackTreeNodeIterator <T> end()  { return RedBlackTreeNodeIterator <T> (NULL); }
+      RedBlackTreeNodeIterator <T> rbegin();
+      RedBlackTreeNodeIterator <T> rend() { return RedBlackTreeNodeIterator <T> (NULL); }
       
    private:
       BinaryNode <T> * root; 
@@ -79,160 +79,227 @@ class BST
             pNode->data = rhs->data;
             copyBinaryTree(pNode->pLeft, rhs->pLeft);
             copyBinaryTree(pNode->pRight, rhs->pRight);
-         }
-         catch(std::bad_alloc)
-         {
-            throw "ERROR: Unable to allocate a node";
-         }
-      }
+		 }
+		 catch (std::bad_alloc)
+		 {
+			 throw "ERROR: Unable to allocate a node";
+		 }
+	  }
 };
 
 /***********************************************
- * BST :: COPY CONSTRUCTOR
+ * RedBlackTreeNode :: COPY CONSTRUCTOR
  * Copy rhs to current tree
  **********************************************/
-template <class T> 
-BST <T> :: BST(const BST <T> & rhs) throw (const char *)
+template <class T>
+RedBlackTreeNode <T> ::RedBlackTreeNode(const RedBlackTreeNode <T> & rhs) throw (const char *)
 {
-   copyBinaryTree(root, rhs.root);
+	copyBinaryTree(root, rhs.root);
 }
 
 /***********************************************
- * BST :: OPERATOR =
+ * RedBlackTreeNode :: OPERATOR =
  * Assign rhs to current tree
  **********************************************/
 template <class T>
- BST <T> & BST <T> :: operator = (const BST <T> & rhs) throw (const char *)
+RedBlackTreeNode <T> & RedBlackTreeNode <T> :: operator = (const RedBlackTreeNode <T> & rhs) throw (const char *)
 {
-   // check for !empty tree
-   if (!empty())
-      clear();
-   // IF rhs NULL
-   if (rhs.root == NULL)
-      root = NULL;
-   // copy the tree
-   copyBinaryTree(root, rhs.root);
-   
-   return *this;
+	// check for !empty tree
+	if (!empty())
+		clear();
+	// IF rhs NULL
+	if (rhs.root == NULL)
+		root = NULL;
+	// copy the tree
+	copyBinaryTree(root, rhs.root);
+
+	return *this;
 }
 
 /***********************************************
- * BST :: INSERT
+ * RedBlackTreeNode :: INSERT
  * Insert a value into the tree
  **********************************************/
 template <class T>
-void BST <T> :: insert(const T & t) throw (const char *)
+void RedBlackTreeNode <T> ::insert(const T & t) throw (const char *)
 {
-   // empty tree
-   if (empty())
-   {
-      try
-      {
-         root = new BinaryNode <T>(t);
-         return;
-      }
-      catch (std::bad_alloc)
-      {
-         throw "ERROR: Unable to allocate a node";
-      }
-   }
-   else
-   {
-      BinaryNode <T> * pNode = NULL;
-      try
-      {
-         pNode = new BinaryNode <T>(t);
-      }
-      catch (std::bad_alloc)
-      {
-         throw "ERROR: Unable to allocate a node";
-      }
-      BinaryNode <T> * pCurrent = root; 
-	  assert(pNode!=NULL);
-	  assert(pNode->data != NULL);
-	  assert(pCurrent != NULL);
-      // WHILE place not found
-      bool isFound = false;
-      while (!isFound)
-      {
-         // compare & traverse
-         if (pNode->data > pCurrent->data)
-         {
-            if (pCurrent->pRight == NULL)
-            {
-               pCurrent->addRight(pNode);
-               isFound = true;
-            }
-         }
-         else
-         {
-            if (pCurrent->pLeft == NULL)
-            {
-               pCurrent->addLeft(pNode);
-               isFound = true;
-            }
-         }
-      }
-   }
+	// empty tree
+	if (empty())
+	{
+		try
+		{
+			root = new BinaryNode <T>(t);
+			return;
+		}
+		catch (std::bad_alloc)
+		{
+			throw "ERROR: Unable to allocate a node";
+		}
+	}
+
+	BinaryNode <T> * pParent;
+	BinaryNode <T> * pGrandparent;
+	BinaryNode <T> * pGreatGrandparent;
+	BinaryNode <T> * pAunt;
+	BinaryNode <T> * pSibling;
+	BinaryNode <T> * pCurrent = root;
+	while (pCurrent != NULL)
+	{
+		// save your spot
+		pGreatGrandparent = pGrandparent;
+		pGrandparent = pParent;
+		pParent = pCurrent;
+		if (pGrandparent->pLeft == pParent)
+			pAunt = pGrandparent->pRight;
+		if (pGrandparent->pRight == pParent)
+			pAunt = pGrandparent->pLeft;
+		if (t > pCurrent->data)
+		{
+			pSibling = pCurrent->pLeft;
+			pCurrent = pCurrent->pRight;
+		}
+		else
+		{
+			pSibling = pCurrent->pRight;
+			pCurrent = pCurrent->pLeft;
+		}
+	}
+	try
+	{
+		pCurrent = new BinaryNode <T>(t);
+		pCurrent->pParent = pParent;
+		if (pCurrent->data > pParent->data)
+			pParent->pRight = pCurrent;
+		else
+			pParent->pLeft = pCurrent;
+
+		// Case 1 No Parent
+		if (pCurrent == root)
+		{
+			pCurrent->setBlack();
+		}
+		//Case 2 is taken care of because the constructor automatically
+		//makes the new node red.
+
+		//Case 3 If the new node's parent is red, grandparent is black, 
+		   // and aunt is red, then we re-color the
+		   // three.The grandparent becomes red, the parent 
+		   // becomes black, and the aunt becomes black.Note that
+		   // we may need to do more work if the great - grandparent is red.		if (pParent->isRed() && pGrandparent->isBlack() && pAunt->isRed())		{			pGrandparent->setRed();			pParent->setBlack();			pAunt->setBlack();			if (pGreatGrandparent->isRed())				; // TODO: Something. I'm not sure.		}		// Case 4		if (pParent->isRed() && pGrandparent->isBlack()			&& pAunt->isBlack())		{			// Subcase 4.a.			if (pCurrent == pParent->pLeft && pParent == pGrandparent->pLeft)			{				pParent->setBlack();				pParent = pGrandparent;				pParent->pLeft = pCurrent;				pParent->pRight = pGrandparent;				pGrandparent->setRed();				pGrandparent->pLeft = pSibling;				pGrandparent->pRight = pAunt;			}			// Subcase 4.b.			else if (pCurrent == pParent->pRight && pParent == pGrandparent->pLeft)			{				pParent = pGrandparent;				pGrandparent = pParent;				// Distribute children of pCurrent				if (pAunt == pGrandparent->pLeft)					pGrandparent->pRight = pCurrent->pRight;				if (pAunt == pGrandparent->pRight)					pGrandparent->pLeft = pCurrent->pRight;				if (pSibling == pParent->pLeft)					pParent->pRight = pCurrent->pLeft;				if (pSibling == pParent->pRight)					pParent->pLeft = pCurrent->pLeft;			}			// Subcase 4.c.			else if (pCurrent == pParent->pRight && pParent == pGrandparent->pRight)			{				pParent->setBlack();				pParent = pGrandparent;				pParent->pRight = pCurrent;				pParent->pLeft = pGrandparent;				pGrandparent->setRed();				pGrandparent->pRight = pSibling;				pGrandparent->pLeft = pAunt;			}			// Subcase 4.d.			else if (pCurrent == pParent->pLeft && pParent == pGrandparent->pRight)			{				if (pSibling->isBlack() //All the rest of the conditionals are part of first if statement					&& pParent->pLeft == pCurrent && pGrandparent->pRight == pParent)				{					pGrandparent->pRight = pCurrent->pLeft;					pParent->pLeft = pCurrent->pRight;					if (pGreatGrandparent == NULL)						pCurrent->pParent = NULL;					else if (pGreatGrandparent->pRight == pGrandparent)						pGreatGrandparent->pRight = pCurrent;					else						pGreatGrandparent->pLeft = pCurrent;					pCurrent->pLeft = pGrandparent;					pCurrent->pRight = pParent;					pGrandparent->setRed();					pCurrent->setBlack();				}			}		}
+	  }
+	  catch (std::bad_alloc)
+	  {
+		  throw "ERROR: Unable to allocate node";
+	  }
+      // Set everything right
+	  pCurrent->pParent->pParent->pParent = pGreatGrandparent;
+	  pCurrent->pParent->pParent = pGrandparent;
+	  pCurrent->pParent = pParent;
+	  if (pSibling == pCurrent->pParent->pLeft)		  pCurrent->pParent->pLeft = pSibling;	  if (pSibling == pCurrent->pParent->pRight)		  pCurrent->pParent->pRight = pSibling;
+	  if (pAunt == pCurrent->pParent->pParent->pRight)		  pCurrent->pParent->pParent->pRight = pAunt;
+	  if (pAunt == pCurrent->pParent->pParent->pLeft)		  pCurrent->pParent->pParent->pLeft = pAunt;
+
+	  if (pCurrent->data > pParent->data)
+		  pParent->pRight = pCurrent;
+	  else
+		  pParent->pLeft = pCurrent;
 }
 
 /***********************************************
- * BST :: REMOVE
+ * RedBlackTreeNode :: REMOVE
  * Remove a value from the tree
  **********************************************/
 template <class T>
-void BST <T> :: remove(BSTIterator <T> & it)
+void RedBlackTreeNode <T> :: remove(RedBlackTreeNodeIterator <T> & it)
 {
+	//TODO: Proper remove
+	// find the node
+	BinaryNode <T> * pNode = it.getNode();
+	// do nothing if there is nothing to do
+	if (pNode == NULL)
+		return;
+
+	// if there is only one child (right) or no children (how sad!)
+	if (pNode->pLeft == NULL)
+		deleteNode(pNode, true /* goRight */);
+
+	// if there is only one child (left)
+	else if (pNode->pRight == NULL)
+		deleteNode(pNode, false /* goRight */);
+
+	// otherwise, swap places with the in-order successor
+	else
+	{
+		// find the in-order successor
+		BinaryNode <T> * pNodeIOS = pNode->pRight;
+
+		while (pNodeIOS->pLeft != NULL)
+			pNodeIOS = pNodeIOS->pLeft;
+
+		// copy its data
+		pNode->data = pNodeIOS->data;
+
+		// if there are any children under the in-order successor, fix them
+		assert(pNodeIOS->pLeft == NULL); // there cannot be a left child or
+
+										 // I would not be the IOS
+		deleteNode(pNodeIOS, true /*goRight*/);
+
+		// prepare for deletion
+		pNode = pNodeIOS;
+	}
+
+	delete pNode;
    
 }
 
 /***********************************************
- * BST :: FIND
+ * RedBlackTreeNode :: FIND
  * Return an iterator to a value in the tree
  **********************************************/
 template <class T>
-BSTIterator <T> BST <T> :: find(const T & t)
+RedBlackTreeNodeIterator <T> RedBlackTreeNode <T> :: find(const T & t)
 {
-   return BSTIterator <T> (NULL);
+   return RedBlackTreeNodeIterator <T> (NULL);
 }
 
 /***********************************************
- * BST :: BEGIN
+ * RedBlackTreeNode :: BEGIN
  * Return an iterator to the start of the tree
  **********************************************/
 template <class T>
-BSTIterator <T> BST <T> :: begin()
+RedBlackTreeNodeIterator <T> RedBlackTreeNode <T> :: begin()
 {
-   return BSTIterator <T> (NULL); 
+   return RedBlackTreeNodeIterator <T> (NULL); 
 }
 
 /***********************************************
- * BST :: RBEGIN
+ * RedBlackTreeNode :: RBEGIN
  * return a reverse iterator
  **********************************************/
 template <class T>
-BSTIterator <T> BST <T> :: rbegin()
+RedBlackTreeNodeIterator <T> RedBlackTreeNode <T> :: rbegin()
 {
-   return BSTIterator <T> (NULL);
+   return RedBlackTreeNodeIterator <T> (NULL);
 }
 
 
 /***********************************************
- * BST ITERATOR
- * A class to iterate through the BST
+ * RedBlackTreeNode ITERATOR
+ * A class to iterate through the RedBlackTreeNode
  **********************************************/
 template <class T>
-class BSTIterator
+class RedBlackTreeNodeIterator
 {
    public:
-      BSTIterator(BinaryNode <T> * pNode);
-      BSTIterator(Stack <BinaryNode <T> *> nodes);
+      RedBlackTreeNodeIterator(BinaryNode <T> * pNode);
+      RedBlackTreeNodeIterator(Stack <BinaryNode <T> *> nodes);
       
-      BSTIterator <T> & operator = (const Stack <BinaryNode <T> *> rhs);
+      RedBlackTreeNodeIterator <T> & operator = (const Stack <BinaryNode <T> *> rhs);
       
-      bool operator == (const BSTIterator <T> & rhs) const;
+      bool operator == (const RedBlackTreeNodeIterator <T> & rhs) const;
       
-      bool operator != (const BSTIterator <T> & rhs) const;
+      bool operator != (const RedBlackTreeNodeIterator <T> & rhs) const;
       
       // return const by reference to keep tree valid
       const T & operator * ()
@@ -240,58 +307,58 @@ class BSTIterator
          return nodes.top();
       }
       
-      BSTIterator <T> & operator -- ();
-      BSTIterator <T> & operator ++ ();
-      BSTIterator <T>   operator ++ (int postfix);
+      RedBlackTreeNodeIterator <T> & operator -- ();
+      RedBlackTreeNodeIterator <T> & operator ++ ();
+      RedBlackTreeNodeIterator <T>   operator ++ (int postfix);
       
    private:
       Stack <BinaryNode <T> *> nodes;
 };
  
 template <class T>
-BSTIterator <T> :: BSTIterator(BinaryNode <T> * pNode)
+RedBlackTreeNodeIterator <T> :: RedBlackTreeNodeIterator(BinaryNode <T> * pNode)
 {
    
 }
 
 template <class T>
-BSTIterator <T> :: BSTIterator(Stack <BinaryNode <T> *> nodes)
+RedBlackTreeNodeIterator <T> :: RedBlackTreeNodeIterator(Stack <BinaryNode <T> *> nodes)
 {
    
 }
 
 template <class T>
-BSTIterator <T> & BSTIterator <T> :: operator = (const Stack <BinaryNode <T> *> rhs)
+RedBlackTreeNodeIterator <T> & RedBlackTreeNodeIterator <T> :: operator = (const Stack <BinaryNode <T> *> rhs)
 {
    
 }
 
 template <class T>
-bool BSTIterator <T> :: operator == (const BSTIterator <T> & rhs) const
+bool RedBlackTreeNodeIterator <T> :: operator == (const RedBlackTreeNodeIterator <T> & rhs) const
 {
    
 }
 
 template <class T>
-bool BSTIterator <T> :: operator != (const BSTIterator <T> & rhs) const
+bool RedBlackTreeNodeIterator <T> :: operator != (const RedBlackTreeNodeIterator <T> & rhs) const
 {
    
 }
 
 template <class T>
-BSTIterator <T> & BSTIterator <T> :: operator ++ ()
+RedBlackTreeNodeIterator <T> & RedBlackTreeNodeIterator <T> :: operator ++ ()
 {
    
 }
 
 template <class T>
-BSTIterator <T> BSTIterator <T> :: operator ++ (int postfix)
+RedBlackTreeNodeIterator <T> RedBlackTreeNodeIterator <T> :: operator ++ (int postfix)
 {
    
 }
       
 /**************************************************
- * BST ITERATOR :: DECREMENT PREFIX
+ * RedBlackTreeNode ITERATOR :: DECREMENT PREFIX
  *     advance by one. Note that this implementation uses
  *     a stack of nodes to remember where we are. This stack
  *     is called "nodes".
@@ -299,7 +366,7 @@ BSTIterator <T> BSTIterator <T> :: operator ++ (int postfix)
  * Performance: O(log n) though O(1) in the common case
  *************************************************/
 template <class T>
-BSTIterator <T> & BSTIterator <T> :: operator -- ()
+RedBlackTreeNodeIterator <T> & RedBlackTreeNodeIterator <T> :: operator -- ()
 {
    // do nothing if we have nothing
    if (nodes.top() == NULL)
@@ -339,5 +406,5 @@ BSTIterator <T> & BSTIterator <T> :: operator -- ()
    return *this;
 }
 
-#endif // BST_H
+#endif // RedBlackTreeNode_H
 
