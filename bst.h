@@ -185,7 +185,84 @@ void RedBlackTreeNode <T> ::insert(const T & t) throw (const char *)
 		   // and aunt is red, then we re-color the
 		   // three.The grandparent becomes red, the parent 
 		   // becomes black, and the aunt becomes black.Note that
-		   // we may need to do more work if the great - grandparent is red.		if (pParent->isRed() && pGrandparent->isBlack() && pAunt->isRed())		{			pGrandparent->setRed();			pParent->setBlack();			pAunt->setBlack();			if (pGreatGrandparent->isRed())				; // TODO: Something. I'm not sure.		}		// Case 4		if (pParent->isRed() && pGrandparent->isBlack()			&& pAunt->isBlack())		{			// Subcase 4.a.			if (pCurrent == pParent->pLeft && pParent == pGrandparent->pLeft)			{				pParent->setBlack();				pParent = pGrandparent;				pParent->pLeft = pCurrent;				pParent->pRight = pGrandparent;				pGrandparent->setRed();				pGrandparent->pLeft = pSibling;				pGrandparent->pRight = pAunt;			}			// Subcase 4.b.			else if (pCurrent == pParent->pRight && pParent == pGrandparent->pLeft)			{				pParent = pGrandparent;				pGrandparent = pParent;				// Distribute children of pCurrent				if (pAunt == pGrandparent->pLeft)					pGrandparent->pRight = pCurrent->pRight;				if (pAunt == pGrandparent->pRight)					pGrandparent->pLeft = pCurrent->pRight;				if (pSibling == pParent->pLeft)					pParent->pRight = pCurrent->pLeft;				if (pSibling == pParent->pRight)					pParent->pLeft = pCurrent->pLeft;			}			// Subcase 4.c.			else if (pCurrent == pParent->pRight && pParent == pGrandparent->pRight)			{				pParent->setBlack();				pParent = pGrandparent;				pParent->pRight = pCurrent;				pParent->pLeft = pGrandparent;				pGrandparent->setRed();				pGrandparent->pRight = pSibling;				pGrandparent->pLeft = pAunt;			}			// Subcase 4.d.			else if (pCurrent == pParent->pLeft && pParent == pGrandparent->pRight)			{				if (pSibling->isBlack() //All the rest of the conditionals are part of first if statement					&& pParent->pLeft == pCurrent && pGrandparent->pRight == pParent)				{					pGrandparent->pRight = pCurrent->pLeft;					pParent->pLeft = pCurrent->pRight;					if (pGreatGrandparent == NULL)						pCurrent->pParent = NULL;					else if (pGreatGrandparent->pRight == pGrandparent)						pGreatGrandparent->pRight = pCurrent;					else						pGreatGrandparent->pLeft = pCurrent;					pCurrent->pLeft = pGrandparent;					pCurrent->pRight = pParent;					pGrandparent->setRed();					pCurrent->setBlack();				}			}		}
+		   // we may need to do more work if the great - grandparent is red.
+		if (pParent->isRed() && pGrandparent->isBlack() && pAunt->isRed())
+		{
+			pGrandparent->setRed();
+			pParent->setBlack();
+			pAunt->setBlack();
+			if (pGreatGrandparent->isRed())
+				; // TODO: Something. I'm not sure.
+		}
+
+		// Case 4
+		if (pParent->isRed() && pGrandparent->isBlack()
+			&& pAunt->isBlack())
+		{
+			// Subcase 4.a.
+			if (pCurrent == pParent->pLeft && pParent == pGrandparent->pLeft)
+			{
+				pParent->setBlack();
+				pParent = pGrandparent;
+				pParent->pLeft = pCurrent;
+				pParent->pRight = pGrandparent;
+				pGrandparent->setRed();
+				pGrandparent->pLeft = pSibling;
+				pGrandparent->pRight = pAunt;
+			}
+			// Subcase 4.b.
+			else if (pCurrent == pParent->pRight && pParent == pGrandparent->pLeft)
+			{
+				pParent = pGrandparent;
+				pGrandparent = pParent;
+
+				// Distribute children of pCurrent
+				if (pAunt == pGrandparent->pLeft)
+					pGrandparent->pRight = pCurrent->pRight;
+				if (pAunt == pGrandparent->pRight)
+					pGrandparent->pLeft = pCurrent->pRight;
+
+				if (pSibling == pParent->pLeft)
+					pParent->pRight = pCurrent->pLeft;
+				if (pSibling == pParent->pRight)
+					pParent->pLeft = pCurrent->pLeft;
+			}
+			// Subcase 4.c.
+			else if (pCurrent == pParent->pRight && pParent == pGrandparent->pRight)
+			{
+				pParent->setBlack();
+				pParent = pGrandparent;
+				pParent->pRight = pCurrent;
+				pParent->pLeft = pGrandparent;
+				pGrandparent->setRed();
+				pGrandparent->pRight = pSibling;
+				pGrandparent->pLeft = pAunt;
+			}
+			// Subcase 4.d
+			else if (pCurrent == pParent->pLeft && pParent == pGrandparent->pRight)
+			{
+				if (pSibling->isBlack() //All the rest of the conditionals are part of first if statement
+					&& pParent->pLeft == pCurrent && pGrandparent->pRight == pParent)
+				{
+					pGrandparent->pRight = pCurrent->pLeft;
+					pParent->pLeft = pCurrent->pRight;
+
+					if (pGreatGrandparent == NULL)
+						pCurrent->pParent = NULL;
+					else if (pGreatGrandparent->pRight == pGrandparent)
+						pGreatGrandparent->pRight = pCurrent;
+					else
+						pGreatGrandparent->pLeft = pCurrent;
+
+					pCurrent->pLeft = pGrandparent;
+					pCurrent->pRight = pParent;
+
+					pGrandparent->setRed();
+					pCurrent->setBlack();
+				}
+
+			}
+		}
 	  }
 	  catch (std::bad_alloc)
 	  {
@@ -195,9 +272,14 @@ void RedBlackTreeNode <T> ::insert(const T & t) throw (const char *)
 	  pCurrent->pParent->pParent->pParent = pGreatGrandparent;
 	  pCurrent->pParent->pParent = pGrandparent;
 	  pCurrent->pParent = pParent;
-	  if (pSibling == pCurrent->pParent->pLeft)		  pCurrent->pParent->pLeft = pSibling;	  if (pSibling == pCurrent->pParent->pRight)		  pCurrent->pParent->pRight = pSibling;
-	  if (pAunt == pCurrent->pParent->pParent->pRight)		  pCurrent->pParent->pParent->pRight = pAunt;
-	  if (pAunt == pCurrent->pParent->pParent->pLeft)		  pCurrent->pParent->pParent->pLeft = pAunt;
+	  if (pSibling == pCurrent->pParent->pLeft)
+		  pCurrent->pParent->pLeft = pSibling;
+	  if (pSibling == pCurrent->pParent->pRight)
+		  pCurrent->pParent->pRight = pSibling;
+	  if (pAunt == pCurrent->pParent->pParent->pRight)
+		  pCurrent->pParent->pParent->pRight = pAunt;
+	  if (pAunt == pCurrent->pParent->pParent->pLeft)
+		  pCurrent->pParent->pParent->pLeft = pAunt;
 
 	  if (pCurrent->data > pParent->data)
 		  pParent->pRight = pCurrent;
