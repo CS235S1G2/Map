@@ -10,9 +10,6 @@
 
 //#include "map.h"       // for MAP
 #include "wordCount.h" // for wordCount() prototype
-using namespace std;
-
-
 
 /*****************************************************
 * WORD COUNT
@@ -24,38 +21,34 @@ void wordCount()
 	map <string, double> counts;
 	string input;
 	string filename;
-	Pair <string, string> userInput;
-	userInput = promptUser();
-	input = userInput.getFirst();
-	filename = userInput.getSecond();
+	filename = promptUser();
 	while (input != "!")
 	{
 		cout << "> ";
 		getline(cin, input);
+		if (input == "!")
+			return;
 		readFile(counts, filename, input);
 		display(input, counts);
 	}
 
 }
 
-Pair<string, string> promptUser()
+string promptUser()
 {
-	Pair<string, string> userInput;
 	string filename;
-	string input;
-	char a;
 	cout << "What is the filename to be counted? ";
 	cin.ignore();
 	getline(cin, filename);
 	cout << "What word whose frequency is to be found. Type  ! when done\n";
-	return userInput;
+	return filename;
 }
 
-void readFile(map<string, double>& counts, const string & fileName, const string & search)
+void readFile(map<string, double>& counts, string fileName, const string & search)
 {
 	double wordCount = 0;
 	string input;
-	ifstream fin(fileName.c_str()); //TODO flag fileName
+	ifstream fin(fileName.c_str());
 	if (fin.fail())
 		cerr << "Unable to open file\n";
 	else
@@ -67,7 +60,6 @@ void readFile(map<string, double>& counts, const string & fileName, const string
 			}
 		}
 	fin.close();
-	//counts.insert(search, wordCount);
 	counts[search] = wordCount;
 }
 

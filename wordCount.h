@@ -22,9 +22,9 @@ using namespace std;
 * user for words to get the count from
 *****************************************************/
 void wordCount();
-Pair<string, string> promptUser();
+string promptUser();
 void readFile(map <string, double> & counts,
-	const string & fileName,
+	string fileName,
 	const string & search);
 void display(string input, map<string, double>& counts);
 
