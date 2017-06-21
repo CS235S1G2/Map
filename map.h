@@ -12,9 +12,7 @@
 * MAP
 * 
 **********************************************/
-template <class K>
-template <class V>
-template <class T>
+template <class K, class V>
 class Map
 {
 public:
@@ -28,15 +26,16 @@ public:
 	bool empty() { return bst->empty(); }
 	int size() { return bst->empty() ? 0 : bst->root->size();}
 	void clear() { bst->clear(); }
-	RedBlackTreeNodeIterator <T> find(const T & t) {return bst->find(t);}
-	RedBlackTreeNodeIterator <T> begin() { return bst->begin();}
-	RedBlackTreeNodeIterator <T> end() { return bst->end();}
+	RedBlackTreeNodeIterator <Pair<K,V>> find(const Pair<K,V> & t) {return bst->find(t);}
+	RedBlackTreeNodeIterator <Pair<K,V>> begin() { return bst->begin();}
+	RedBlackTreeNodeIterator <Pair<K,V>> end() { return bst->end();}
 	// operator=
 	// operator[]
 	
 	// members
 	// BST made from pair type
-    BST <Pair<K,V>> * bst;
+private:
+    RedBlackTreeNode <Pair<K,V>> * bst;
 
 };
 
