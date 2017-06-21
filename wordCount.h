@@ -17,14 +17,14 @@
 #include "pair.h"
 using namespace std;
 /*****************************************************
- * WORD COUNT
- * Prompt the user for a file to read, then prompt the
- * user for words to get the count from
- *****************************************************/
+* WORD COUNT
+* Prompt the user for a file to read, then prompt the
+* user for words to get the count from
+*****************************************************/
 void wordCount();
-Pair<string,string> promptUser();
+Pair<string, string> promptUser();
 void readFile(map <string, double> & counts,
-	const string & fileName, 
+	const string & fileName,
 	const string & search);
 void display(string input, map<string, double>& counts);
 
