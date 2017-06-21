@@ -3,12 +3,12 @@
 *    Week 10, WORD COUNT
 *    Brother Helfrich, CS 235
 * Author:
-*    <your name here>
+*    Nathan Bench, Jed Billman, Jeremy Chandler, Justin Chandler
 * Summary:
 *    This program will implement the wordCount() function
 ************************************************************************/
 
-//#include "map.h"       // for MAP
+#include "map.h"       // for MAP
 #include "wordCount.h" // for wordCount() prototype
 
 /*****************************************************
@@ -18,17 +18,19 @@
 *****************************************************/
 void wordCount()
 {
-	map <string, double> counts;
+	Map <string, Count> counts;
 	string input;
 	string filename;
 	filename = promptUser();
+   
+   readFile(counts, filename);
 	while (input != "!")
 	{
 		cout << "> ";
 		getline(cin, input);
 		if (input == "!")
 			return;
-		readFile(counts, filename, input);
+		
 		display(input, counts);
 	}
 
@@ -40,13 +42,12 @@ string promptUser()
 	cout << "What is the filename to be counted? ";
 	cin.ignore();
 	getline(cin, filename);
-	cout << "What word whose frequency is to be found. Type  ! when done\n";
+	cout << "What word whose frequency is to be found. Type ! when done\n";
 	return filename;
 }
 
-void readFile(map<string, double>& counts, string fileName, const string & search)
+void readFile(Map<string, Count>& counts, string fileName)
 {
-	double wordCount = 0;
 	string input;
 	ifstream fin(fileName.c_str());
 	if (fin.fail())
@@ -54,17 +55,20 @@ void readFile(map<string, double>& counts, string fileName, const string & searc
 	else
 		while (fin >> input)
 		{
-			if (input == search)
-			{
-				wordCount++;
-			}
+         counts[input];
+         counts[input] += 1;
 		}
 	fin.close();
-	counts[search] = wordCount;
 }
 
-void display(string input, map<string, double>& counts)
+void display(string input, Map<string, Count>& counts)
 {
 	cout << "\t" << input << " : " << counts[input] << "\n";
+}
+
+std::ostream & operator << (std::ostream & out, const Count & rhs)
+{
+   out << rhs.num;
+   return out;
 }
 
